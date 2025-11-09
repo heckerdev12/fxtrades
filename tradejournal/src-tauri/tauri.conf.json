@@ -10,13 +10,26 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "tradejournal",
-        "width": 800,
-        "height": 600
+        "title": "Trading Journal",
+        "width": 1200,
+        "height": 800
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "main-capability",
+          "windows": ["main"],
+          "permissions": [
+            "sql:allow-load",
+            "sql:allow-execute",
+            "sql:allow-select",
+            "sql:allow-close",
+            "sql:default"
+          ]
+        }
+      ]
     }
   },
   "bundle": {
@@ -29,5 +42,17 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "sql": {
+      "preload": ["sqlite:trading_journal.db"],
+      "scope": {
+        "allowed": [
+          {
+            "database": "sqlite:trading_journal.db"
+          }
+        ]
+      }
+    }
   }
 }
