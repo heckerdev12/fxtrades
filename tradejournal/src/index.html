@@ -1,39 +1,244 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
-    <script type="module" src="/main.js" defer></script>
-  </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Journal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Profile Setup Screen -->
+    <div class="profile-setup active" id="profileSetup">
+        <div class="setup-card">
+            <h1>Welcome to Trading Journal</h1>
+            <p>Let's set up your profile to get started</p>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="userName" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Currency *</label>
+                    <select id="currency" required>
+                        <option value="">Select...</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="JPY">JPY</option>
+                        <option value="KES">KES</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Profile</button>
+            </form>
+        </div>
+    </div>
 
-  <body>
-    <main class="container">
-      <h1>Welcome to Tauri</h1>
+    <!-- Main Application -->
+    <div class="main-app" id="mainApp">
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-details">
+                        <h2 id="displayName">Trader</h2>
+                        <p id="displayEmail">trader@example.com</p>
+                    </div>
+                </div>
+            </div>
 
-      <div class="row">
-        <a href="https://tauri.app" target="_blank">
-          <img src="/assets/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a
-          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"
-          target="_blank"
-        >
-          <img
-            src="/assets/javascript.svg"
-            class="logo vanilla"
-            alt="JavaScript logo"
-          />
-        </a>
-      </div>
-      <p>Click on the Tauri logo to learn more about the framework</p>
+            <!-- Dashboard Stats -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <h3>Total P&L</h3>
+                    <div class="value" id="totalPnL">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Trades</h3>
+                    <div class="value" id="totalTrades">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Win Rate</h3>
+                    <div class="value" id="winRate">0%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Trading Volume</h3>
+                    <div class="value" id="totalVolume">0</div>
+                </div>
+            </div>
 
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p id="greet-msg"></p>
-    </main>
-  </body>
+            <!-- Trading Accounts -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Trading Accounts</h2>
+                    <button class="btn btn-secondary" onclick="openAccountModal()">+ Add Account</button>
+                </div>
+                <div class="accounts-grid" id="accountsGrid">
+                    <div class="empty-state">
+                        <p>No trading accounts yet. Create one to start journaling!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Trades -->
+            <div class="section" id="tradesSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Recent Trades</h2>
+                    <button class="btn btn-secondary" onclick="openTradeModal()">+ Add Trade</button>
+                </div>
+                <table class="trades-table" id="tradesTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Symbol</th>
+                            <th>Type</th>
+                            <th>Entry</th>
+                            <th>Exit</th>
+                            <th>Lots</th>
+                            <th>P&L</th>
+                            <th>R:R</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradesBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Account Modal -->
+    <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Trading Account</h2>
+                <button class="close-btn" onclick="closeAccountModal()">×</button>
+            </div>
+            <form id="accountForm">
+                <div class="form-group">
+                    <label>Account Name *</label>
+                    <input type="text" id="accountName" required placeholder="e.g., FTMO Demo, XM Live">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Account Type *</label>
+                        <select id="accountType" required>
+                            <option value="demo">Demo</option>
+                            <option value="live">Live</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Initial Balance *</label>
+                        <input type="number" id="initialBalance" required step="0.01" placeholder="10000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Broker *</label>
+                        <input type="text" id="broker" required placeholder="e.g., FTMO, XM">
+                    </div>
+                    <div class="form-group">
+                        <label>Leverage *</label>
+                        <input type="text" id="leverage" required placeholder="e.g., 1:100">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Instruments</label>
+                    <input type="text" id="instruments" placeholder="e.g., Forex, Indices, Commodities">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Trade Modal -->
+    <div class="modal" id="tradeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Trade</h2>
+                <button class="close-btn" onclick="closeTradeModal()">×</button>
+            </div>
+            <form id="tradeForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Currency Pair *</label>
+                        <input type="text" id="symbol" required placeholder="e.g., EURUSD">
+                    </div>
+                    <div class="form-group">
+                        <label>Trade Type *</label>
+                        <select id="tradeType" required>
+                            <option value="long">Long</option>
+                            <option value="short">Short</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Entry Price *</label>
+                        <input type="number" id="entryPrice" required step="0.00001" placeholder="1.08500">
+                    </div>
+                    <div class="form-group">
+                        <label>Exit Price</label>
+                        <input type="number" id="exitPrice" step="0.00001" placeholder="1.08700">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Take Profit *</label>
+                        <input type="number" id="takeProfit" required step="0.00001" placeholder="1.09000">
+                    </div>
+                    <div class="form-group">
+                        <label>Stop Loss *</label>
+                        <input type="number" id="stopLoss" required step="0.00001" placeholder="1.08300">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Lot Size *</label>
+                        <input type="number" id="lotSize" required step="0.01" placeholder="0.10">
+                    </div>
+                    <div class="form-group">
+                        <label>Volume *</label>
+                        <input type="number" id="volume" required step="0.01" placeholder="10000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Profit/Loss *</label>
+                        <input type="number" id="profit" required step="0.01" placeholder="50.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Commission</label>
+                        <input type="number" id="commission" step="0.01" placeholder="7.00">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Risk:Reward Ratio</label>
+                    <input type="text" id="rrRatio" readonly placeholder="Calculated automatically">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Strategy</label>
+                        <input type="text" id="strategy" placeholder="e.g., Breakout, Scalping">
+                    </div>
+                    <div class="form-group">
+                        <label>Session</label>
+                        <select id="session">
+                            <option value="">Select...</option>
+                            <option value="asian">Asian</option>
+                            <option value="london">London</option>
+                            <option value="newyork">New York</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Duration</label>
+                    <input type="text" id="duration" placeholder="e.g., 2h 30m">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Trade</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
 </html>
